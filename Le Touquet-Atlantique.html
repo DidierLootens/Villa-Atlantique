@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Villa Côtière - Le Touquet-Paris-Plage</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
+        
+        :root {
+            --sand: #F5EFE7;
+            --ocean: #2C5F7C;
+            --ocean-light: #4A8FAF;
+            --ocean-dark: #1A3A4F;
+            --terracotta: #D4896D;
+            --sage: #9DAD8E;
+            --white: #FFFFFF;
+            --off-white: #FDFCFA;
+            --text-dark: #2A2A2A;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--off-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+        }
+        
+        /* Header / Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 5%;
+            box-shadow: 0 2px 20px var(--shadow);
+            animation: slideDown 0.6s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--ocean);
+            letter-spacing: 1px;
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .language-selector {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .lang-btn {
+            padding: 0.5rem 0.8rem;
+            background: transparent;
+            border: 2px solid var(--ocean);
+            color: var(--ocean);
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .lang-btn:hover {
+            background: var(--ocean);
+            color: var(--white);
+        }
+        
+        .lang-btn.active {
+            background: var(--ocean);
+            color: var(--white);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 400;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--ocean);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--ocean);
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-top: 0;
+        }
+        
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(135deg, rgba(44, 95, 124, 0.85) 0%, rgba(74, 143, 175, 0.85) 100%),
+                url('facade.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.95;
+        }
+        
+        .hero-image-note {
+            display: none;
+        }
+        
+        .hero-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.03) 35px, rgba(255,255,255,.03) 70px);
+            animation: patternMove 20s linear infinite;
+        }
+        
+        @keyframes patternMove {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(70px) translateY(70px); }
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            color: var(--white);
+            padding: 2rem;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hero h1 {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+        }
+        
+        .hero-features {
+            display: flex;
+            gap: 3rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            font-size: 1rem;
+            font-weight: 300;
+        }
+        
+        .hero-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .eco-badge {
+            position: absolute;
+            top: 120px;
+            right: 40px;
+            background: linear-gradient(135deg, #9DAD8E 0%, #7B9C6E 100%);
+            color: var(--white);
+            padding: 1.5rem 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 15;
+            animation: fadeInRight 1s ease-out 0.5s both;
+            text-align: center;
+        }
+        
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .eco-badge-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .eco-badge-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+        
+        .eco-badge-subtext {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 0.3rem;
+        }
+        
+        .btn-primary {
+            display: inline-block;
+            padding: 1.2rem 3rem;
+            background: var(--terracotta);
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            letter-spacing: 1px;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(212, 137, 109, 0.3);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(212, 137, 109, 0.4);
+            background: #C67860;
+        }
+        
+        /* Section Styles */
+        section {
+            padding: 6rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            font-size: 3.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: var(--ocean-dark);
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            color: var(--ocean);
+            font-size: 1.1rem;
+            margin-bottom: 4rem;
+            font-weight: 300;
+        }
+        
+        /* Gallery Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+        
+        .gallery-item {
+            position: relative;
+            height: 350px;
+            background: var(--sand);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            box-shadow: 0 10px 30px var(--shadow);
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.02);
+        }
+        
+        .gallery-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.7));
+            z-index: 1;
+        }
+        
+        .gallery-label {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: var(--white);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            z-index: 2;
+        }
+        
+        .photo-placeholder {
+            display: none;
+        }
+        
+        /* Features */
+        .features {
+            background: linear-gradient(135deg, var(--sand) 0%, var(--off-white) 100%);
+            border-radius: 20px;
+            padding: 4rem;
+            margin: 4rem 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px var(--shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+            color: var(--ocean);
+        }
+        
+        /* Booking Section */
+        .booking-section {
+            background: var(--ocean);
+            color: var(--white);
+            padding: 6rem 5%;
+            margin: 4rem 0;
+        }
+        
+        .booking-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .booking-form {
+            background: var(--white);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        input, select, textarea {
+            padding: 1rem;
+            border: 2px solid var(--sand);
+            border-radius: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--ocean);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .price-display {
+            background: var(--sand);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        
+        .price-label {
+            color: var(--ocean);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .price-amount {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            color: var(--ocean-dark);
+            font-weight: 700;
+        }
+        
+        .price-detail {
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Location */
+        .location-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        
+        .map-placeholder {
+            background: var(--sand);
+            height: 400px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--ocean);
+            box-shadow: 0 10px 30px var(--shadow);
+        }
+        
+        .location-details {
+            padding: 2rem;
+        }
+        
+        .location-item {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--sand);
+            border-radius: 15px;
+        }
+        
+        .location-icon {
+            font-size: 2rem;
+            color: var(--ocean);
+        }
+        
+        .location-text h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.3rem;
+            color: var(--ocean-dark);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--ocean-dark);
+            color: var(--white);
+            padding: 3rem 5%;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--ocean);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .language-selector {
+                gap: 0.3rem;
+            }
+            
+            .lang-btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.75rem;
+            }
+            
+            .eco-badge {
+                top: 100px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+            }
+            
+            .eco-badge-icon {
+                font-size: 2rem;
+            }
+            
+            .eco-badge-text {
+                font-size: 0.95rem;
+            }
+            
+            .hero h1 {
+                font-size: 3rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .hero-features {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .section-title {
+                font-size: 2.5rem;
+            }
+            
+            .location-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .booking-form {
+                padding: 2rem 1.5rem;
+            }
+            
+            section {
+                padding: 4rem 5%;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--white);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <header>
+        <nav>
+            <div class="logo">Villa Côtière</div>
+            <div class="nav-right">
+                <ul class="nav-links">
+                    <li><a href="#accueil" data-i18n="nav-home">Accueil</a></li>
+                    <li><a href="#galerie" data-i18n="nav-gallery">Galerie</a></li>
+                    <li><a href="#equipements" data-i18n="nav-amenities">Équipements</a></li>
+                    <li><a href="#reservation" data-i18n="nav-booking">Réservation</a></li>
+                    <li><a href="#localisation" data-i18n="nav-location">Localisation</a></li>
+                    <li><a href="#contact" data-i18n="nav-contact">Contact</a></li>
+                </ul>
+                <div class="language-selector">
+                    <button class="lang-btn active" data-lang="fr">FR</button>
+                    <button class="lang-btn" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="de">DE</button>
+                    <button class="lang-btn" data-lang="nl">NL</button>
+                </div>
+            </div>
+            <button class="mobile-menu-btn">☰</button>
+        </nav>
+    </header>
+
+    <section class="hero" id="accueil">
+        <div class="hero-bg"></div>
+        <div class="hero-pattern"></div>
+        <div class="eco-badge">
+            <div class="eco-badge-icon">🌿</div>
+            <div class="eco-badge-text" data-i18n="eco-badge">NET ZÉRO</div>
+            <div class="eco-badge-subtext" data-i18n="eco-badge-sub">Maison Écologique</div>
+        </div>
+        <div class="hero-content">
+            <h1 data-i18n="hero-title">Villa Côtière</h1>
+            <p class="hero-subtitle" data-i18n="hero-subtitle">Maison Touquetoise Neuve - Architecture Moderne & Écologique</p>
+            <div class="hero-features">
+                <div class="hero-feature">🏖️ <span data-i18n="hero-beach">200m de la plage</span></div>
+                <div class="hero-feature">🛒 <span data-i18n="hero-market">300m du marché</span></div>
+                <div class="hero-feature">🌿 <span data-i18n="hero-netzero">Net Zéro</span></div>
+            </div>
+            <a href="#reservation" class="btn-primary" data-i18n="hero-cta">Réserver Maintenant</a>
+        </div>
+    </section>
+
+    <section id="galerie">
+        <h2 class="section-title" data-i18n="gallery-title">Découvrez la Villa</h2>
+        <p class="section-subtitle" data-i18n="gallery-subtitle">Architecture touquetoise moderne avec tout le confort</p>
+        
+        <div class="gallery-grid">
+            <div class="gallery-item" style="background-image: url('plage.jpg'); background-size: cover; background-position: center;">
+                <span class="gallery-label" data-i18n="gallery-beach">La Plage à 200m</span>
+            </div>
+            <div class="gallery-item" style="background-image: url('salon.jpg'); background-size: cover; background-position: center;">
+                <span class="gallery-label" data-i18n="gallery-living">Salon avec Cheminée</span>
+            </div>
+            <div class="gallery-item" style="background-image: url('cuisine.jpg'); background-size: cover; background-position: center;">
+                <span class="gallery-label" data-i18n="gallery-kitchen">Cuisine Équipée</span>
+            </div>
+            <div class="gallery-item" style="background-image: url('chambre.jpg'); background-size: cover; background-position: center;">
+                <span class="gallery-label" data-i18n="gallery-bedroom">Chambre Principale</span>
+            </div>
+            <div class="gallery-item" style="background-image: url('sauna.jpg'); background-size: cover; background-position: center;">
+                <span class="gallery-label" data-i18n="gallery-sauna">Sauna Privé</span>
+            </div>
+            <div class="gallery-item" style="background-image: url('jardin.jpg'); background-size: cover; background-position: center;">
+                <span class="gallery-label" data-i18n="gallery-garden">Jardin Équipé</span>
+            </div>
+            <div class="gallery-item" style="background-image: url('salle-bain.jpg'); background-size: cover; background-position: center;">
+                <span class="gallery-label" data-i18n="gallery-bathroom">Salle de Bain</span>
+            </div>
+            <div class="gallery-item" style="background-image: url('terrasse.jpg'); background-size: cover; background-position: center;">
+                <span class="gallery-label" data-i18n="gallery-terrace">Terrasse & Parking</span>
+            </div>
+        </div>
+        <p style="text-align: center; color: var(--ocean); font-size: 0.95rem; display: none;">
+            💡 <span data-i18n="gallery-note">Ajoutez vos photos en remplaçant les arrière-plans dans le code CSS</span>
+        </p>
+    </section>
+
+    <div class="features">
+        <h2 class="section-title" data-i18n="features-title">Équipements</h2>
+        <p class="section-subtitle" data-i18n="features-subtitle">Maison neuve avec tout le confort moderne</p>
+        
+        <div class="features-grid" id="equipements">
+            <div class="feature-card">
+                <div class="feature-icon">🏠</div>
+                <h3 class="feature-title" data-i18n="feat-space">3 Chambres</h3>
+                <p data-i18n="feat-space-desc">Espace généreux pour 6 personnes avec literie de qualité</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛁</div>
+                <h3 class="feature-title" data-i18n="feat-bath">2 Salles de Bain</h3>
+                <p data-i18n="feat-bath-desc">Salles de bain modernes entièrement équipées</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔥</div>
+                <h3 class="feature-title" data-i18n="feat-fireplace">Cheminée</h3>
+                <p data-i18n="feat-fireplace-desc">Ambiance chaleureuse pour vos soirées d'hiver</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🧖</div>
+                <h3 class="feature-title" data-i18n="feat-sauna">Sauna Privé</h3>
+                <p data-i18n="feat-sauna-desc">Détente et bien-être à domicile</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🍳</div>
+                <h3 class="feature-title" data-i18n="feat-kitchen">Cuisine Équipée</h3>
+                <p data-i18n="feat-kitchen-desc">Cuisine moderne avec tous les appareils</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📶</div>
+                <h3 class="feature-title" data-i18n="feat-wifi">WiFi Fibre</h3>
+                <p data-i18n="feat-wifi-desc">Connexion haut débit incluse</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🚗</div>
+                <h3 class="feature-title" data-i18n="feat-parking">2 Parkings Privés</h3>
+                <p data-i18n="feat-parking-desc">Places sécurisées sur la propriété</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌳</div>
+                <h3 class="feature-title" data-i18n="feat-garden">Jardin Équipé</h3>
+                <p data-i18n="feat-garden-desc">Espace extérieur avec mobilier et barbecue</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌿</div>
+                <h3 class="feature-title" data-i18n="feat-eco">Net Zéro Énergie</h3>
+                <p data-i18n="feat-eco-desc">Construction écologique, maison autonome en énergie</p>
+            </div>
+        </div>
+    </div>
+
+    <section class="booking-section" id="reservation">
+        <div class="booking-container">
+            <h2 class="section-title">Réservez Votre Séjour</h2>
+            <p class="section-subtitle">Paiement sécurisé en ligne</p>
+            
+            <form class="booking-form" id="bookingForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="checkin">Date d'arrivée</label>
+                        <input type="date" id="checkin" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkout">Date de départ</label>
+                        <input type="date" id="checkout" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="guests">Nombre de personnes</label>
+                        <select id="guests" required>
+                            <option value="1">1 personne</option>
+                            <option value="2">2 personnes</option>
+                            <option value="3">3 personnes</option>
+                            <option value="4">4 personnes</option>
+                            <option value="5">5 personnes</option>
+                            <option value="6">6 personnes</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Nom complet</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Téléphone</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">Message (optionnel)</label>
+                    <textarea id="message" placeholder="Questions ou demandes particulières..."></textarea>
+                </div>
+                
+                <div class="price-display">
+                    <div class="price-label">Prix total</div>
+                    <div class="price-amount" id="totalPrice">0 €</div>
+                    <div class="price-detail" id="nightsCount">Sélectionnez vos dates</div>
+                </div>
+                
+                <button type="submit" class="btn-primary" style="width: 100%; font-size: 1.1rem;">
+                    Procéder au Paiement
+                </button>
+                
+                <p style="text-align: center; margin-top: 1rem; color: var(--text-dark); font-size: 0.9rem;">
+                    🔒 Paiement sécurisé via Stripe
+                </p>
+            </form>
+        </div>
+    </section>
+
+    <section id="localisation">
+        <h2 class="section-title">Localisation Idéale</h2>
+        <p class="section-subtitle">Au cœur du Touquet-Paris-Plage</p>
+        
+        <div class="location-grid">
+            <div class="map-placeholder">
+                🗺️ Carte interactive Google Maps
+                <br><small>(Intégrer votre carte ici)</small>
+            </div>
+            
+            <div class="location-details">
+                <div class="location-item">
+                    <div class="location-icon">🏖️</div>
+                    <div class="location-text">
+                        <h3>Plage</h3>
+                        <p>À seulement 200 mètres - 2 minutes à pied pour profiter de la mer et du sable fin</p>
+                    </div>
+                </div>
+                
+                <div class="location-item">
+                    <div class="location-icon">🛒</div>
+                    <div class="location-text">
+                        <h3>Marché Couvert</h3>
+                        <p>300 mètres - Produits frais locaux tous les matins</p>
+                    </div>
+                </div>
+                
+                <div class="location-item">
+                    <div class="location-icon">🍽️</div>
+                    <div class="location-text">
+                        <h3>Centre-ville</h3>
+                        <p>5 minutes à pied - Restaurants, commerces et animations</p>
+                    </div>
+                </div>
+                
+                <div class="location-item">
+                    <div class="location-icon">⛳</div>
+                    <div class="location-text">
+                        <h3>Golf</h3>
+                        <p>10 minutes en voiture - Parcours de golf réputés</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="footer-content">
+            <h3 style="font-size: 2rem; margin-bottom: 1rem;">Contactez-nous</h3>
+            
+            <div class="contact-info">
+                <div class="contact-item">
+                    📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="93f0fcfde7f2f0e7d3e5fafffff2f0fce7faf6e1f6bee7fce6e2e6f6e7bdf5e1">[email&#160;protected]</a>
+                </div>
+                <div class="contact-item">
+                    📱 +33 6 XX XX XX XX
+                </div>
+                <div class="contact-item">
+                    📍 Le Touquet-Paris-Plage, France
+                </div>
+            </div>
+            
+            <p style="margin-top: 2rem; opacity: 0.8;">
+                © 2024 Villa Côtière - Tous droits réservés
+            </p>
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // Configuration Stripe (REMPLACEZ par votre clé publique)
+        const stripe = Stripe('pk_test_VOTRE_CLE_PUBLIQUE_STRIPE');
+        
+        // Calcul du prix
+        const PRICE_PER_NIGHT = 150; // Prix par nuit en euros
+        
+        document.getElementById('checkin').addEventListener('change', calculatePrice);
+        document.getElementById('checkout').addEventListener('change', calculatePrice);
+        
+        function calculatePrice() {
+            const checkin = new Date(document.getElementById('checkin').value);
+            const checkout = new Date(document.getElementById('checkout').value);
+            
+            if (checkin && checkout && checkout > checkin) {
+                const nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+                const total = nights * PRICE_PER_NIGHT;
+                
+                document.getElementById('totalPrice').textContent = total + ' €';
+                document.getElementById('nightsCount').textContent = `${nights} nuit${nights > 1 ? 's' : ''} × ${PRICE_PER_NIGHT}€`;
+            } else {
+                document.getElementById('totalPrice').textContent = '0 €';
+                document.getElementById('nightsCount').textContent = 'Sélectionnez vos dates';
+            }
+        }
+        
+        // Soumission du formulaire
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const checkin = new Date(document.getElementById('checkin').value);
+            const checkout = new Date(document.getElementById('checkout').value);
+            const nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+            const total = nights * PRICE_PER_NIGHT;
+            
+            if (total === 0) {
+                alert('Veuillez sélectionner des dates valides.');
+                return;
+            }
+            
+            // Afficher le loader
+            document.getElementById('loadingOverlay').classList.add('active');
+            
+            // Ici vous devriez faire un appel à votre serveur backend
+            // pour créer une session de paiement Stripe
+            
+            // EXEMPLE (vous devez créer votre backend) :
+            try {
+                // Simulation d'une requête backend
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Dans un vrai système, vous feriez :
+                // const response = await fetch('/create-checkout-session', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify({
+                //         checkin: document.getElementById('checkin').value,
+                //         checkout: document.getElementById('checkout').value,
+                //         guests: document.getElementById('guests').value,
+                //         name: document.getElementById('name').value,
+                //         email: document.getElementById('email').value,
+                //         phone: document.getElementById('phone').value,
+                //         message: document.getElementById('message').value,
+                //         amount: total
+                //     })
+                // });
+                // const session = await response.json();
+                // await stripe.redirectToCheckout({ sessionId: session.id });
+                
+                document.getElementById('loadingOverlay').classList.remove('active');
+                alert('Fonctionnalité de démonstration !\n\n' +
+                      'Pour activer les paiements réels :\n' +
+                      '1. Créez un compte Stripe (stripe.com)\n' +
+                      '2. Configurez un backend pour créer des sessions de paiement\n' +
+                      '3. Remplacez la clé publique Stripe dans le code\n\n' +
+                      `Réservation : ${nights} nuits pour ${total}€`);
+                
+            } catch (error) {
+                document.getElementById('loadingOverlay').classList.remove('active');
+                alert('Une erreur est survenue. Veuillez réessayer.');
+                console.error(error);
+            }
+        });
+        
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+        
+        // Date minimale = aujourd'hui
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('checkin').setAttribute('min', today);
+        document.getElementById('checkout').setAttribute('min', today);
+        
+        // Mettre à jour la date de checkout minimale quand checkin change
+        document.getElementById('checkin').addEventListener('change', function() {
+            const checkinDate = new Date(this.value);
+            checkinDate.setDate(checkinDate.getDate() + 1);
+            const minCheckout = checkinDate.toISOString().split('T')[0];
+            document.getElementById('checkout').setAttribute('min', minCheckout);
+        });
+        
+        // ============= MULTILINGUAL SUPPORT =============
+        const translations = {
+            fr: {
+                'nav-home': 'Accueil',
+                'nav-gallery': 'Galerie',
+                'nav-amenities': 'Équipements',
+                'nav-booking': 'Réservation',
+                'nav-location': 'Localisation',
+                'nav-contact': 'Contact',
+                'hero-title': 'Villa Côtière',
+                'hero-subtitle': 'Maison Touquetoise Neuve - Architecture Moderne & Écologique',
+                'hero-beach': '200m de la plage',
+                'hero-market': '300m du marché',
+                'hero-netzero': 'Net Zéro',
+                'hero-cta': 'Réserver Maintenant',
+                'eco-badge': 'NET ZÉRO',
+                'eco-badge-sub': 'Maison Écologique',
+                'gallery-title': 'Découvrez la Villa',
+                'gallery-subtitle': 'Architecture touquetoise moderne avec tout le confort',
+                'gallery-beach': 'La Plage à 200m',
+                'gallery-living': 'Salon avec Cheminée',
+                'gallery-kitchen': 'Cuisine Équipée',
+                'gallery-bedroom': 'Chambre Principale',
+                'gallery-sauna': 'Sauna Privé',
+                'gallery-garden': 'Jardin Équipé',
+                'gallery-bathroom': 'Salle de Bain',
+                'gallery-terrace': 'Terrasse & Parking',
+                'gallery-note': 'Ajoutez vos photos en remplaçant les arrière-plans dans le code CSS',
+                'features-title': 'Équipements',
+                'features-subtitle': 'Maison neuve avec tout le confort moderne',
+                'feat-space': '3 Chambres',
+                'feat-space-desc': 'Espace généreux pour 6 personnes avec literie de qualité',
+                'feat-bath': '2 Salles de Bain',
+                'feat-bath-desc': 'Salles de bain modernes entièrement équipées',
+                'feat-fireplace': 'Cheminée',
+                'feat-fireplace-desc': 'Ambiance chaleureuse pour vos soirées d\'hiver',
+                'feat-sauna': 'Sauna Privé',
+                'feat-sauna-desc': 'Détente et bien-être à domicile',
+                'feat-kitchen': 'Cuisine Équipée',
+                'feat-kitchen-desc': 'Cuisine moderne avec tous les appareils',
+                'feat-wifi': 'WiFi Fibre',
+                'feat-wifi-desc': 'Connexion haut débit incluse',
+                'feat-parking': '2 Parkings Privés',
+                'feat-parking-desc': 'Places sécurisées sur la propriété',
+                'feat-garden': 'Jardin Équipé',
+                'feat-garden-desc': 'Espace extérieur avec mobilier et barbecue',
+                'feat-eco': 'Net Zéro Énergie',
+                'feat-eco-desc': 'Construction écologique, maison autonome en énergie'
+            },
+            en: {
+                'nav-home': 'Home',
+                'nav-gallery': 'Gallery',
+                'nav-amenities': 'Amenities',
+                'nav-booking': 'Booking',
+                'nav-location': 'Location',
+                'nav-contact': 'Contact',
+                'hero-title': 'Coastal Villa',
+                'hero-subtitle': 'New Touquet House - Modern & Eco-Friendly Architecture',
+                'hero-beach': '200m from beach',
+                'hero-market': '300m from market',
+                'hero-netzero': 'Net Zero',
+                'hero-cta': 'Book Now',
+                'eco-badge': 'NET ZERO',
+                'eco-badge-sub': 'Eco-Friendly House',
+                'gallery-title': 'Discover the Villa',
+                'gallery-subtitle': 'Modern Touquet architecture with all comforts',
+                'gallery-beach': 'Beach at 200m',
+                'gallery-living': 'Living Room with Fireplace',
+                'gallery-kitchen': 'Equipped Kitchen',
+                'gallery-bedroom': 'Main Bedroom',
+                'gallery-sauna': 'Private Sauna',
+                'gallery-garden': 'Equipped Garden',
+                'gallery-bathroom': 'Bathroom',
+                'gallery-terrace': 'Terrace & Parking',
+                'gallery-note': 'Add your photos by replacing backgrounds in the CSS code',
+                'features-title': 'Amenities',
+                'features-subtitle': 'New house with all modern comforts',
+                'feat-space': '3 Bedrooms',
+                'feat-space-desc': 'Generous space for 6 people with quality bedding',
+                'feat-bath': '2 Bathrooms',
+                'feat-bath-desc': 'Fully equipped modern bathrooms',
+                'feat-fireplace': 'Fireplace',
+                'feat-fireplace-desc': 'Cozy atmosphere for your winter evenings',
+                'feat-sauna': 'Private Sauna',
+                'feat-sauna-desc': 'Relaxation and wellness at home',
+                'feat-kitchen': 'Equipped Kitchen',
+                'feat-kitchen-desc': 'Modern kitchen with all appliances',
+                'feat-wifi': 'Fiber WiFi',
+                'feat-wifi-desc': 'High-speed connection included',
+                'feat-parking': '2 Private Parkings',
+                'feat-parking-desc': 'Secure spaces on the property',
+                'feat-garden': 'Equipped Garden',
+                'feat-garden-desc': 'Outdoor space with furniture and BBQ',
+                'feat-eco': 'Net Zero Energy',
+                'feat-eco-desc': 'Eco-friendly construction, energy self-sufficient house'
+            },
+            de: {
+                'nav-home': 'Startseite',
+                'nav-gallery': 'Galerie',
+                'nav-amenities': 'Ausstattung',
+                'nav-booking': 'Buchung',
+                'nav-location': 'Lage',
+                'nav-contact': 'Kontakt',
+                'hero-title': 'Küstenvilla',
+                'hero-subtitle': 'Neues Touquet-Haus - Moderne & Ökologische Architektur',
+                'hero-beach': '200m vom Strand',
+                'hero-market': '300m vom Markt',
+                'hero-netzero': 'Null Energie',
+                'hero-cta': 'Jetzt Buchen',
+                'eco-badge': 'NULL ENERGIE',
+                'eco-badge-sub': 'Öko-Haus',
+                'gallery-title': 'Entdecken Sie die Villa',
+                'gallery-subtitle': 'Moderne Touquet-Architektur mit allem Komfort',
+                'gallery-beach': 'Strand in 200m',
+                'gallery-living': 'Wohnzimmer mit Kamin',
+                'gallery-kitchen': 'Ausgestattete Küche',
+                'gallery-bedroom': 'Hauptschlafzimmer',
+                'gallery-sauna': 'Private Sauna',
+                'gallery-garden': 'Ausgestatteter Garten',
+                'gallery-bathroom': 'Badezimmer',
+                'gallery-terrace': 'Terrasse & Parkplatz',
+                'gallery-note': 'Fügen Sie Ihre Fotos hinzu, indem Sie Hintergründe im CSS-Code ersetzen',
+                'features-title': 'Ausstattung',
+                'features-subtitle': 'Neues Haus mit allem modernen Komfort',
+                'feat-space': '3 Schlafzimmer',
+                'feat-space-desc': 'Großzügiger Raum für 6 Personen mit hochwertiger Bettwäsche',
+                'feat-bath': '2 Badezimmer',
+                'feat-bath-desc': 'Voll ausgestattete moderne Badezimmer',
+                'feat-fireplace': 'Kamin',
+                'feat-fireplace-desc': 'Gemütliche Atmosphäre für Ihre Winterabende',
+                'feat-sauna': 'Private Sauna',
+                'feat-sauna-desc': 'Entspannung und Wellness zu Hause',
+                'feat-kitchen': 'Ausgestattete Küche',
+                'feat-kitchen-desc': 'Moderne Küche mit allen Geräten',
+                'feat-wifi': 'Glasfaser WiFi',
+                'feat-wifi-desc': 'Highspeed-Verbindung inklusive',
+                'feat-parking': '2 Private Parkplätze',
+                'feat-parking-desc': 'Sichere Plätze auf dem Grundstück',
+                'feat-garden': 'Ausgestatteter Garten',
+                'feat-garden-desc': 'Außenbereich mit Möbeln und Grill',
+                'feat-eco': 'Null-Energie',
+                'feat-eco-desc': 'Ökologische Bauweise, energieautarkes Haus'
+            },
+            nl: {
+                'nav-home': 'Home',
+                'nav-gallery': 'Galerij',
+                'nav-amenities': 'Faciliteiten',
+                'nav-booking': 'Reservering',
+                'nav-location': 'Locatie',
+                'nav-contact': 'Contact',
+                'hero-title': 'Kustvilla',
+                'hero-subtitle': 'Nieuw Touquet Huis - Modern & Ecologisch',
+                'hero-beach': '200m van het strand',
+                'hero-market': '300m van de markt',
+                'hero-netzero': 'Nul Energie',
+                'hero-cta': 'Nu Boeken',
+                'eco-badge': 'NUL ENERGIE',
+                'eco-badge-sub': 'Ecologisch Huis',
+                'gallery-title': 'Ontdek de Villa',
+                'gallery-subtitle': 'Moderne Touquet architectuur met alle comfort',
+                'gallery-beach': 'Strand op 200m',
+                'gallery-living': 'Woonkamer met Open Haard',
+                'gallery-kitchen': 'Uitgeruste Keuken',
+                'gallery-bedroom': 'Hoofdslaapkamer',
+                'gallery-sauna': 'Privé Sauna',
+                'gallery-garden': 'Uitgeruste Tuin',
+                'gallery-bathroom': 'Badkamer',
+                'gallery-terrace': 'Terras & Parking',
+                'gallery-note': 'Voeg uw foto\'s toe door achtergronden in de CSS-code te vervangen',
+                'features-title': 'Faciliteiten',
+                'features-subtitle': 'Nieuw huis met alle moderne comfort',
+                'feat-space': '3 Slaapkamers',
+                'feat-space-desc': 'Ruime ruimte voor 6 personen met kwaliteitsbeddengoed',
+                'feat-bath': '2 Badkamers',
+                'feat-bath-desc': 'Volledig uitgeruste moderne badkamers',
+                'feat-fireplace': 'Open Haard',
+                'feat-fireplace-desc': 'Gezellige sfeer voor uw winteravonden',
+                'feat-sauna': 'Privé Sauna',
+                'feat-sauna-desc': 'Ontspanning en wellness thuis',
+                'feat-kitchen': 'Uitgeruste Keuken',
+                'feat-kitchen-desc': 'Moderne keuken met alle apparaten',
+                'feat-wifi': 'Glasvezel WiFi',
+                'feat-wifi-desc': 'Hogesnelheidsverbinding inbegrepen',
+                'feat-parking': '2 Privé Parkeerplaatsen',
+                'feat-parking-desc': 'Beveiligde plaatsen op het terrein',
+                'feat-garden': 'Uitgeruste Tuin',
+                'feat-garden-desc': 'Buitenruimte met meubilair en BBQ',
+                'feat-eco': 'Nul Energie',
+                'feat-eco-desc': 'Ecologische bouw, energieneutraal huis'
+            }
+        };
+        
+        let currentLang = 'fr';
+        
+        function changeLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            
+            // Update all elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+            
+            // Update active language button
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-lang') === lang) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+        
+        // Language selector event listeners
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const lang = btn.getAttribute('data-lang');
+                changeLanguage(lang);
+            });
+        });
+    </script>
+</body>
+</html>
